@@ -4,77 +4,61 @@ using UnityEngine;
 
 public class movement : MonoBehaviour
 {
+    Rigidbody rig;
+    bool left, right;
 
-    [SerializeField] private float speed;
-    [SerializeField] private float rotationSpeed;
+    [SerializeField]
+    float speed;
 
-    private Touch _touch;
+    [SerializeField]
+    float jump_force;
 
-    private Vector3 _touchDown; // alınan ilk nokta
-    private Vector3 _touchUp;   // ikinci nokta
-
-    private bool _dragStarted;
-    private bool _isMoving;
-
-    Animator anim;
     void Start()
     {
-        anim = gameObject.GetComponent<Animator>();
+        rig = GetComponent<Rigidbody>();
     }
 
     
     void Update()
     {
 
-         if (Input.touchCount > 0)
-         {
-             _touch = Input.GetTouch(0); // ekrana dokunulan ilk nokta
-             if (_touch.phase == TouchPhase.Began)
-             {
-                 _dragStarted = true;
-                 _isMoving = true;
-                 //anim.SetBool("isRun", true);
-                 _touchDown = _touch.position;
-                 _touchUp = _touch.position;
-             }
-         }
+        transform.Translate(Vector3.forward * speed * Time.deltaTime);
+        Vector3 go_right = new Vector3(3.15f, transform.position.y, transform.position.z);
+        Vector3 go_left = new Vector3(-4.80f, transform.position.y, transform.position.z);
 
-         if (_dragStarted)
-         {
-             if(_touch.phase == TouchPhase.Moved) // eğer kullanıcı parmağı ile sürüklerse
-             {
-                 _touchDown = _touch.position;
-             }
-             if (_touch.phase == TouchPhase.Ended) // parmağını çektiğinde
-             {
-                 _touchDown = _touch.position;
-                 _isMoving = false;
-                 //anim.SetBool("isRun", false);
-                 _dragStarted = false;
-             }
-             gameObject.transform.rotation = Quaternion.RotateTowards(transform.rotation, calculateRotation(), rotationSpeed * Time.deltaTime); //rotateTowards karakterin yönünün değişmesini sağlar
-             gameObject.transform.Translate(Vector3.forward * Time.deltaTime * speed); // karakter baktığı yöne doğru hareket eder
-         }
-        //anim.SetBool("isRun", true);
-        //gameObject.transform.Translate(Vector3.forward * Time.deltaTime * speed); // karakter baktığı yöne doğru hareket eder
-    }
+        if (Input.touchCount > 0)
+        {
+            Touch finger = Input.GetTouch(0);
 
-    Vector3 calculateDirection()
-    {
-        Vector3 temp = (_touchDown - _touchUp).normalized; // normalize değerleri küçültür
-        temp.z = temp.y;
-        temp.y = 0;
-        return temp;
+            if(finger.deltaPosition.x > 20.0f)
+            {
+                right = true;
+                left = false;
+            }
+           
+            if (finger.deltaPosition.x <  -20.0f)
+            {
+                right = false;
+                left = true;
+            }
+            
+            if (finger.deltaPosition.y > 30.0f)
+            {
+                rig.velocity = Vector3.zero;
+                rig.velocity = Vector3.up * jump_force;
+            }
+            
+            if (right == true)
+            {
+                transform.position = Vector3.Lerp(transform.position, go_right, 5 * Time.deltaTime);
+            }
 
-    }  
+            if (left == true)
+            {
+                transform.position = Vector3.Lerp(transform.position, go_left, 5 * Time.deltaTime);
+            }
 
-    Quaternion calculateRotation()
-    {
-        Quaternion temp = Quaternion.LookRotation(calculateDirection(), Vector3.up);
-        return temp;
-    }
-    public bool IsMoving()
-    {
-        return _isMoving;
+        }
+
     }
 }

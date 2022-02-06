@@ -54,7 +54,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\movement.cs" />
-    <Compile Include="Assets\Scripts\first.cs" />
     <Compile Include="Assets\Scripts\trackManagement.cs" />
   </ItemGroup>
   <ItemGroup>
